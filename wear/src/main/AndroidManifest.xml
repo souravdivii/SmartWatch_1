@@ -15,9 +15,7 @@
         android:theme="@style/Theme.Design.NoActionBar">
         <activity
             android:name=".AmbienceActivity"
-            android:exported="false"
-            android:label="@string/title_activity_ambience"
-            android:theme="@style/NoActionBar" />
+            android:exported="false" />
 
         <uses-library
             android:name="com.google.android.wearable"

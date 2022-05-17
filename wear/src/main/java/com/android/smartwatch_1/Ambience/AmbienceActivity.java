@@ -1,10 +1,10 @@
-package Ambience;
-
-import android.os.Bundle;
-import android.widget.TextView;
+package com.android.smartwatch_1.Ambience;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.wear.ambient.AmbientModeSupport;
+
+import android.os.Bundle;
+import android.widget.TextView;
 
 import com.android.smartwatch_1.R;
 
@@ -22,15 +22,6 @@ public class AmbienceActivity extends AppCompatActivity implements
 
         ambientController = AmbientModeSupport.attach(this);
         textView = findViewById(R.id.textView);
-
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-
     }
 
     @Override

@@ -1,7 +1,6 @@
-package Ambience;
+package com.android.smartwatch_1.Ambience;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.wear.ambient.AmbientModeSupport;
