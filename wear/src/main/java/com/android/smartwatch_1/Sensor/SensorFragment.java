@@ -143,7 +143,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
                 mView.setBackgroundColor(Color.rgb(0, 100, 0));
 
                 double a = Math.sqrt(Math.pow(gX, 2) + Math.pow(gY, 2) + Math.pow(gZ, 2));
-                if (calibration == Double.NaN)
+                if (Double.isNaN(calibration))
                     calibration = a;
                 else {
                     Date timeNow = new Date(System.currentTimeMillis());
@@ -155,7 +155,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
                     final double mph = (Math.round(100*velocity / 1.6 * 3.6))/100;
                     Log.i("SensorTestActivity","SPEEDDDDD=== "+mph+"     "+velocity);
                     currentAcceleration = (float)a;
-                    mTextValues.setText((int) currentAcceleration);
+                    mTextValues.setText(currentAcceleration + "");
                 }
             }
             else {
