@@ -98,8 +98,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         // If sensor is unreliable, then just return
-        if (event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE)
-        {
+        if (event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) {
             return;
         }
 
@@ -110,11 +109,12 @@ public class SensorFragment extends Fragment implements SensorEventListener {
                         "z = " + Float.toString(event.values[2]) + "\n"
         );*/
 
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             detectShake(event);
-        }
-        else if(event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+        } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             detectRotation(event);
+        } else if (event.sensor.getType() == Sensor.TYPE_PRESSURE) {
+            detectPressure(event);
         }
     }
 
@@ -124,9 +124,29 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     }
 
     private void detectShake(SensorEvent event) {
-        long now = System.currentTimeMillis();
 
-        if((now - mShakeTime) > SHAKE_WAIT_TIME_MS) {
+        double x = event.values[0];
+        double y = event.values[1];
+        double z = event.values[2];
+        double a = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
+        if (Double.isNaN(calibration))
+            calibration = a;
+        else {
+            Date timeNow = new Date(System.currentTimeMillis());
+            long timeDelta = timeNow.getTime()-lastUpdatedate.getTime();
+            lastUpdatedate.setTime(timeNow.getTime());
+            float deltaVelocity = appliedAcceleration * (timeDelta/1000);
+            appliedAcceleration = currentAcceleration;
+            velocity += deltaVelocity;
+            final double mph = (Math.round(100*velocity / 1.6 * 3.6))/100;
+            Log.i("SensorTestActivity","SPEEDDDDD=== "+mph+"     "+velocity);
+            currentAcceleration = (float)a;
+            mTextValues.setText(currentAcceleration + "");
+        }
+
+        /* long now = System.currentTimeMillis();
+
+        if ((now - mShakeTime) > SHAKE_WAIT_TIME_MS) {
             mShakeTime = now;
 
             float gX = event.values[0] / SensorManager.GRAVITY_EARTH;
@@ -134,12 +154,12 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             float gZ = event.values[2] / SensorManager.GRAVITY_EARTH;
 
             // gForce will be close to 1 when there is no movement
-            float gForce = (float)Math.sqrt (gX*gX + gY*gY + gZ*gZ);
+            float gForce = (float) Math.sqrt(gX * gX + gY * gY + gZ * gZ);
 
 
             // Change background color if gForce exceeds threshold;
             // otherwise, reset the color
-            if(gForce > SHAKE_THRESHOLD) {
+            if (gForce > SHAKE_THRESHOLD) {
                 mView.setBackgroundColor(Color.rgb(0, 100, 0));
 
                 double a = Math.sqrt(Math.pow(gX, 2) + Math.pow(gY, 2) + Math.pow(gZ, 2));
@@ -147,40 +167,42 @@ public class SensorFragment extends Fragment implements SensorEventListener {
                     calibration = a;
                 else {
                     Date timeNow = new Date(System.currentTimeMillis());
-                    long timeDelta = timeNow.getTime()-lastUpdatedate.getTime();
+                    long timeDelta = timeNow.getTime() - lastUpdatedate.getTime();
                     lastUpdatedate.setTime(timeNow.getTime());
-                    float deltaVelocity = appliedAcceleration * (timeDelta/1000);
+                    float deltaVelocity = appliedAcceleration * (timeDelta / 1000);
                     appliedAcceleration = currentAcceleration;
                     velocity += deltaVelocity;
-                    final double mph = (Math.round(100*velocity / 1.6 * 3.6))/100;
-                    Log.i("SensorTestActivity","SPEEDDDDD=== "+mph+"     "+velocity);
-                    currentAcceleration = (float)a;
+                    final double mph = (Math.round(100 * velocity / 1.6 * 3.6)) / 100;
+                    Log.i("SensorTestActivity", "SPEEDDDDD=== " + mph + "     " + velocity);
+                    currentAcceleration = (float) a;
                     mTextValues.setText(currentAcceleration + "");
                 }
-            }
-            else {
+            } else {
                 mView.setBackgroundColor(Color.BLACK);
             }
-        }
+        }*/
     }
 
     private void detectRotation(SensorEvent event) {
         long now = System.currentTimeMillis();
 
-        if((now - mRotationTime) > ROTATION_WAIT_TIME_MS) {
+        if ((now - mRotationTime) > ROTATION_WAIT_TIME_MS) {
             mRotationTime = now;
 
             // Change background color if rate of rotation around any
             // axis and in any direction exceeds threshold;
             // otherwise, reset the color
-            if(Math.abs(event.values[0]) > ROTATION_THRESHOLD ||
+            if (Math.abs(event.values[0]) > ROTATION_THRESHOLD ||
                     Math.abs(event.values[1]) > ROTATION_THRESHOLD ||
                     Math.abs(event.values[2]) > ROTATION_THRESHOLD) {
                 mView.setBackgroundColor(Color.rgb(0, 100, 0));
-            }
-            else {
+            } else {
                 mView.setBackgroundColor(Color.BLACK);
             }
         }
+    }
+
+    private void detectPressure(SensorEvent event) {
+
     }
 }
