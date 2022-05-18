@@ -3,4 +3,6 @@
     <string name="set_threshold">Set Threshold</string>
     <string name="set_threshold_value">Threshold Value</string>
     <string name="_1">1</string>
+    <string name="init_title">Sensor Type</string>
+    <string name="init_values">Getting Data</string>
 </resources>
