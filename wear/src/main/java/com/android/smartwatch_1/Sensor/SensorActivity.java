@@ -1,5 +1,8 @@
 package com.android.smartwatch_1.Sensor;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.wearable.view.DotsPageIndicator;
 import android.support.wearable.view.GridViewPager;
@@ -10,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.android.smartwatch_1.R;
 
 public class SensorActivity extends AppCompatActivity {
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +30,8 @@ public class SensorActivity extends AppCompatActivity {
             DotsPageIndicator indicator = findViewById(R.id.page_indicator);
             indicator.setPager(pager);
         });
+
+
 
     }
 }

@@ -8,12 +8,15 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.smartwatch_1.R;
+
+import java.util.Date;
 
 
 public class SensorFragment extends Fragment implements SensorEventListener {
@@ -31,6 +34,12 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private int mSensorType;
     private long mShakeTime = 0;
     private long mRotationTime = 0;
+
+    float appliedAcceleration = 0;
+    float currentAcceleration = 0;
+    float velocity = 0;
+    Date lastUpdatedate;
+    double calibration = Double.NaN;
 
     public SensorFragment() {
         // Required empty public constructor
@@ -56,6 +65,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             mSensorType = args.getInt("sensorType");
         }
 
+        lastUpdatedate = new Date(System.currentTimeMillis());
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(mSensorType);
     }
@@ -93,11 +103,12 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             return;
         }
 
-        mTextValues.setText(
+        // FIXME: 18-05-2022 
+       /* mTextValues.setText(
                 "x = " + Float.toString(event.values[0]) + "\n" +
                         "y = " + Float.toString(event.values[1]) + "\n" +
                         "z = " + Float.toString(event.values[2]) + "\n"
-        );
+        );*/
 
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             detectShake(event);
@@ -125,10 +136,27 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             // gForce will be close to 1 when there is no movement
             float gForce = (float)Math.sqrt (gX*gX + gY*gY + gZ*gZ);
 
+
             // Change background color if gForce exceeds threshold;
             // otherwise, reset the color
             if(gForce > SHAKE_THRESHOLD) {
                 mView.setBackgroundColor(Color.rgb(0, 100, 0));
+
+                double a = Math.sqrt(Math.pow(gX, 2) + Math.pow(gY, 2) + Math.pow(gZ, 2));
+                if (calibration == Double.NaN)
+                    calibration = a;
+                else {
+                    Date timeNow = new Date(System.currentTimeMillis());
+                    long timeDelta = timeNow.getTime()-lastUpdatedate.getTime();
+                    lastUpdatedate.setTime(timeNow.getTime());
+                    float deltaVelocity = appliedAcceleration * (timeDelta/1000);
+                    appliedAcceleration = currentAcceleration;
+                    velocity += deltaVelocity;
+                    final double mph = (Math.round(100*velocity / 1.6 * 3.6))/100;
+                    Log.i("SensorTestActivity","SPEEDDDDD=== "+mph+"     "+velocity);
+                    currentAcceleration = (float)a;
+                    mTextValues.setText((int) currentAcceleration);
+                }
             }
             else {
                 mView.setBackgroundColor(Color.BLACK);
